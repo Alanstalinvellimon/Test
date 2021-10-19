@@ -35,7 +35,7 @@ async def start(bot, update):
                         [
                             InlineKeyboardButton
                                 (
-                                    '🔊MAIN CHANNEL🔊', url="https://t.me/joinchat/ISZ9R5CdkgBlMzNl"
+                                    '🎸OUR GROUP🎸', url="https://t.me/vlIeYa9keYUxZDY1"
                                 )
                         ]
                     ]
@@ -47,17 +47,17 @@ async def start(bot, update):
         return
 
     buttons = [[
-        InlineKeyboardButton('🔊UPDATE CHANNEL🔊', url='https://t.me/joinchat/axutdh3kmhExZjg1'),
+        InlineKeyboardButton('🍿MAIN CHANNEL🍿', url='https://t.me/https://t.me/joinchat/ISZ9R5CdkgBlMzNl'),
         InlineKeyboardButton('Source Code 🧾', url ='https://github.com/Alanstalinvellimon/Test')
     ],[
-        InlineKeyboardButton('🎸OUR GROUP🎸', url='https://t.me/vlIeYa9keYUxZDY1')
+        InlineKeyboardButton('🥇UPDATE CHANNEL🥇', url='https://t.me/joinchat/axutdh3kmhExZjg1')
     ],[
         InlineKeyboardButton('Help ⚙', callback_data="help")
     ]]
     
     reply_markup = InlineKeyboardMarkup(buttons)
     
-  await bot.send_message(
+    await bot.send_message(
         chat_id=update.chat.id,
         text=Translation.START_TEXT.format(
                 update.from_user.first_name),

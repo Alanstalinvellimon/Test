@@ -35,7 +35,7 @@ async def start(bot, update):
                         [
                             InlineKeyboardButton
                                 (
-                                    '😇MAIN CHANNEL😇', url="https://t.me/joinchat/ISZ9R5CdkgBlMzNl"
+                                    '🍿MAIN CHANNEL🍿', url="https://t.me/joinchat/ISZ9R5CdkgBlMzNl"
                                 )
                         ]
                     ]
@@ -47,19 +47,26 @@ async def start(bot, update):
         return
 
     buttons = [[
-        InlineKeyboardButton('🎸OUR GROUP🎸', url='https://t.me/vlIeYa9keYUxZDY1'),
+        InlineKeyboardButton('🍿MAIN CHANNEL🍿', url='https://t.me/joinchat/ISZ9R5CdkgBlMzNl'),
         InlineKeyboardButton('Source Code 🧾', url ='https://github.com/Alanstalinvellimon/Test')
     ],[
-        InlineKeyboardButton('🍿UPDATE CHANNEL🍿', url='https://t.me/joinchat/axutdh3kmhExZjg1')
+        InlineKeyboardButton('🎸UPDATE CHANNEL🎸', url='https://t.me/joinchat/axutdh3kmhExZjg1')
     ],[
         InlineKeyboardButton('Help ⚙', callback_data="help")
     ]]
     
     reply_markup = InlineKeyboardMarkup(buttons)
- else:
- Send_message = await bot.send_photo( chat_id=update.chat.id,
- photo="https://telegra.ph/file/fd29a8d6e30223503ed7f.jpg",
- caption="<b>Couldn't Find This Movie.Try Again..! ഈ സിനിമയുടെ ഒറിജിനൽ പേര് ഗൂഗിളിൽ പോയി കണ്ടെത്തി അതുപോലെ ഇവിടെ കൊടുക്കുക 🥺</b>", reply_to_message_id=update.message_id )     
+    
+    await bot.send_message(
+        chat_id=update.chat.id,
+        text=Translation.START_TEXT.format(
+                update.from_user.first_name),
+        reply_markup=reply_markup,
+        parse_mode="html",
+        reply_to_message_id=update.message_id
+    )
+
+
 @Client.on_message(filters.command(["help"]) & filters.private, group=1)
 async def help(bot, update):
     buttons = [[

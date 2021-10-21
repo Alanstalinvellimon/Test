@@ -31,6 +31,14 @@ async def start(bot, update):
                 caption = caption,
                 parse_mode="html",
                 reply_markup=InlineKeyboardMarkup(
+               buttons = [[
+        InlineKeyboardButton('🍿MAIN CHANNEL🍿', url='https://t.me/https://t.me/joinchat/ISZ9R5CdkgBlMzNl'),
+        InlineKeyboardButton('Source Code 🧾', url ='https://github.com/Alanstalinvellimon/Test')
+    ],[
+        InlineKeyboardButton('🥇UPDATE CHANNEL🥇', url='https://t.me/joinchat/axutdh3kmhExZjg1')
+    ],[
+        InlineKeyboardButton('Help ⚙', callback_data="help")
+    ]]
                     [
                         [
                             InlineKeyboardButton
@@ -53,14 +61,6 @@ async def start(bot, update):
     Send_message = await bot.send_photo( chat_id=update.chat.id,
  photo="https://telegra.ph/file/fd29a8d6e30223503ed7f.jpg",
  caption="<b>Couldn't Find This Movie.Try Again..! ഈ സിനിമയുടെ ഒറിജിനൽ പേര് ഗൂഗിളിൽ പോയി കണ്ടെത്തി അതുപോലെ ഇവിടെ കൊടുക്കുക 🥺</b>", reply_to_message_id=update.message_id )
-buttons = [[
-        InlineKeyboardButton('🍿MAIN CHANNEL🍿', url='https://t.me/https://t.me/joinchat/ISZ9R5CdkgBlMzNl'),
-        InlineKeyboardButton('Source Code 🧾', url ='https://github.com/Alanstalinvellimon/Test')
-    ],[
-        InlineKeyboardButton('🥇UPDATE CHANNEL🥇', url='https://t.me/joinchat/axutdh3kmhExZjg1')
-    ],[
-        InlineKeyboardButton('Help ⚙', callback_data="help")
-    ]]
 
 @Client.on_message(filters.command(["help"]) & filters.private, group=1)
 async def help(bot, update):

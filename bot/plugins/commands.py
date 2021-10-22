@@ -1,101 +1,211 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-# (c) @AlbertEinsteinTG
+import os
+import logging
+from pyrogram import Client, filters
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from info import START_MSG, CHANNELS, ADMINS, AUTH_CHANNEL, CUSTOM_FILE_CAPTION
+from utils import Media, get_file_details
+from info import TUTORIAL 
+from pyrogram.errors import UserNotParticipant
+logger = logging.getLogger(__name__)
 
-from pyrogram import filters, Client
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
-from bot import Translation, LOGGER # pylint: disable=import-error
-from bot.database import Database # pylint: disable=import-error
-
-db = Database()
-
-@Client.on_message(filters.command(["start"]) & filters.private, group=1)
-async def start(bot, update):
-    
-    try:
-        file_uid = update.command[1]
-    except IndexError:
-        file_uid = False
-    
-    if file_uid:
-        file_id, file_name, file_caption, file_type = await db.get_file(file_uid)
-        
-        if (file_id or file_type) == None:
-            return
-        
-        caption = file_caption if file_caption != ("" or None) else ("<code>" + file_name + "</code>")
-        try:
-            await update.reply_cached_media(
-                file_id,
-                quote=True,
-                caption = caption,
-                parse_mode="html",
-                reply_markup=InlineKeyboardMarkup(
-                    [
+@Client.on_message(filters.command("start"))
+async def start(bot, cmd):
+    usr_cmdall1 = cmd.text
+    if usr_cmdall1.startswith("/start subinps"):
+        if AUTH_CHANNEL:
+            invite_link = await bot.create_chat_invite_link(int(AUTH_CHANNEL))
+            try:
+                user = await bot.get_chat_member(int(AUTH_CHANNEL), cmd.from_user.id)
+                if user.status == "kicked":
+                    await bot.send_message(
+                        chat_id=cmd.from_user.id,
+                        text="Sorry Sir, You are Banned to use me.",
+                        parse_mode="markdown",
+                        disable_web_page_preview=True
+                    )
+                    return
+            except UserNotParticipant:
+                ident, file_id = cmd.text.split("_-_-_-_")
+                await bot.send_message(
+                    chat_id=cmd.from_user.id,
+                    text="**♦️ READ THIS INSTRUCTION ♦️\n ✪ഫയലുകൾ ലഭിക്കുന്നതിനായി  നിങ്ങൾ ഞങ്ങളുടെ ചാനലിൽ join ചെയ്യണം ശേഷം refresh button അമർത്തുക\n ✪ You Need To Join Our Channel and Press Refresh Button to get the File.!**",
+                    reply_markup=InlineKeyboardMarkup(
                         [
-                            InlineKeyboardButton
-                                (
-                                    '🍿MAIN CHANNEL🍿', url="https://t.me/joinchat/ISZ9R5CdkgBlMzNl"
-                                )
+                            [
+                                InlineKeyboardButton("⭕️Join Channel ⭕️", url=invite_link.invite_link)
+                            ],
+                            [
+                                InlineKeyboardButton("🔄Try Again🔃", callback_data=f"checksub#{file_id}")
+                            ]
                         ]
-                    ]
+                    ),
+                    parse_mode="markdown"
                 )
+                return
+            except Exception:
+                await bot.send_message(
+                    chat_id=cmd.from_user.id,
+                    text="Something went Wrong.",
+                    parse_mode="markdown",
+                    disable_web_page_preview=True
+                )
+                return
+        try:
+            ident, file_id = cmd.text.split("_-_-_-_")
+            filedetails = await get_file_details(file_id)
+            for files in filedetails:
+                title = files.file_name
+                size=files.file_size
+                f_caption=files.caption
+                if CUSTOM_FILE_CAPTION:
+                    try:
+                        f_caption=CUSTOM_FILE_CAPTION.format(file_name=title, file_size=size, file_caption=f_caption)
+                    except Exception as e:
+                        print(e)
+                        f_caption=f_caption
+                if f_caption is None:
+                    f_caption = f"{files.file_name}"
+                buttons = [
+                    [
+                        InlineKeyboardButton('🎬 𝑪𝒉𝒂𝒏𝒏𝒆𝒍 🎬', url='https://t.me/joinchat/ISZ9R5CdkgBlMzNl')
+                    ],
+                    [
+                        InlineKeyboardButton('👥 𝑮𝒓𝒐𝒖𝒑 👥', url='https://t.me/vlIeYa9keYUxZDY1')
+                    ]
+                    ]
+                await bot.send_cached_media(
+                    chat_id=cmd.from_user.id,
+                    file_id=file_id,
+                    caption=f_caption,
+                    reply_markup=InlineKeyboardMarkup(buttons)
+                    )
+        except Exception as err:
+            await cmd.reply_text(f"Something went wrong!\n\n**Error:** `{err}`")
+    elif len(cmd.command) > 1 and cmd.command[1] == 'subscribe':
+        invite_link = await bot.create_chat_invite_link(int(AUTH_CHANNEL))
+        await bot.send_message(
+            chat_id=cmd.from_user.id,
+            text="**♦️ READ THIS INSTRUCTION ♦️\n ✪ഫയലുകൾ ലഭിക്കുന്നതിനായി  നിങ്ങൾ ഞങ്ങളുടെ ചാനലിൽ join ചെയ്യണം ശേഷം refresh button അമർത്തുക\n ✪ You Need To Join Our Channel and Press Refresh Button to get the File.!**",           
+            reply_markup=InlineKeyboardMarkup(
+                [
+                    [
+                        InlineKeyboardButton("⭕️Join Channel⭕️", url=invite_link.invite_link)
+                    ]
+                ]
             )
-        except Exception as e:
-            await update.reply_text(f"<b>Error:</b>\n<code>{e}</code>", True, parse_mode="html")
-            LOGGER(__name__).error(e)
+        )
+    else:
+        await cmd.reply_photo(
+
+            photo="https://telegra.ph/file/fd29a8d6e30223503ed7f.jpg",
+
+            caption=f"<b>Hai</b> {cmd.from_user.mention}  Guys!🙋,\n\n<b>I'm[☞ 𝙸𝙼𝙳𝙱 𝙰𝚄𝚃𝙾 𝙵𝙸𝙻𝚃𝙴𝚁 🤖](https://t.me/SUPER_V_18_bot) or you can call me as Auto-Filter Bot You Can Use Me As A Auto-filter in Your Group</b> ....\n\n<b>Its Easy To Use Me; Just Add Me To Your Group As Admin, Thats All, i will Provide Movies There</b>...🤓\n\n<b>©️𝑴𝒂𝒊𝒏𝒕𝒂𝒊𝒏𝒆𝒅 𝒃𝒚</b>   <a href=tg://user?id=1946514705> Alan Stalin♨</a>",
+
+            reply_markup=InlineKeyboardMarkup(
+                [
+                    [
+                        InlineKeyboardButton("➕ 𝑨𝒅𝒅 𝑴𝒆 𝑻𝒐 𝒀𝒐𝒖𝒓 𝑮𝒓𝒐𝒖𝒑 ➕", url= "https://t.me/SUPER_V_18_bot?startgroup=true")
+                    ],
+                    [
+                        InlineKeyboardButton("𝑺𝒆𝒂𝒓𝒄𝒉 𝑯𝒆𝒓𝒆🔎", switch_inline_query_current_chat=''),
+                        InlineKeyboardButton("𝑨𝒏𝒚 𝑯𝒆𝒍𝒑 🛠️", url="https://t.me/MOVIES_SQUAD_ADMIN")
+                    ],
+                    [
+                        InlineKeyboardButton("𝑴𝒚 𝑫𝒆𝒗 🤗", url="https://t.me/MOVIES_SQUAD_ADMIN"),
+                        InlineKeyboardButton("𝑨𝒃𝒐𝒖𝒕 😎", callback_data="about")
+                    ],
+                    [
+                        InlineKeyboardButton("❕ 𝑯𝒐𝒘 𝑻𝒐 𝑼𝒔𝒆 𝑴𝒆 ❕", url="https://t.me/MOVIES_SQUAD_ADMIN")
+                    ]    
+                ]
+            )
+        )
+
+
+@Client.on_message(filters.command('channel') & filters.user(ADMINS))
+async def channel_info(bot, message):
+    """Send basic information of channel"""
+    if isinstance(CHANNELS, (int, str)):
+        channels = [CHANNELS]
+    elif isinstance(CHANNELS, list):
+        channels = CHANNELS
+    else:
+        raise ValueError("Unexpected type of CHANNELS")
+
+    text = '📑 **Indexed channels/groups**\n'
+    for channel in channels:
+        chat = await bot.get_chat(channel)
+        if chat.username:
+            text += '\n@' + chat.username
+        else:
+            text += '\n' + chat.title or chat.first_name
+
+    text += f'\n\n**Total:** {len(CHANNELS)}'
+
+    if len(text) < 4096:
+        await message.reply(text)
+    else:
+        file = 'Indexed channels.txt'
+        with open(file, 'w') as f:
+            f.write(text)
+        await message.reply_document(file)
+        os.remove(file)
+
+
+@Client.on_message(filters.command('total') & filters.user(ADMINS))
+async def total(bot, message):
+    """Show total files in database"""
+    msg = await message.reply("Processing...⏳", quote=True)
+    try:
+        total = await Media.count_documents()
+        await msg.edit(f'📁 Saved files: {total}')
+    except Exception as e:
+        logger.exception('Failed to check total files')
+        await msg.edit(f'Error: {e}')
+
+
+@Client.on_message(filters.command('logger') & filters.user(ADMINS))
+async def log_file(bot, message):
+    """Send log file"""
+    try:
+        await message.reply_document('TelegramBot.log')
+    except Exception as e:
+        await message.reply(str(e))
+
+
+@Client.on_message(filters.command('delete') & filters.user(ADMINS))
+async def delete(bot, message):
+    """Delete file from database"""
+    reply = message.reply_to_message
+    if reply and reply.media:
+        msg = await message.reply("Processing...⏳", quote=True)
+    else:
+        await message.reply('Reply to file with /delete which you want to delete', quote=True)
         return
 
+    for file_type in ("document", "video", "audio"):
+        media = getattr(reply, file_type, None)
+        if media is not None:
+            break
+    else:
+        await msg.edit('This is not supported file format')
+        return
+
+    result = await Media.collection.delete_one({
+        'file_name': media.file_name,
+        'file_size': media.file_size,
+        'mime_type': media.mime_type
+    })
+    if result.deleted_count:
+        await msg.edit('File is successfully deleted from database')
+    else:
+        await msg.edit('File not found in database')
+@Client.on_message(filters.command('about'))
+async def bot_info(bot, message):
     buttons = [[
-        InlineKeyboardButton('🍿MAIN CHANNEL🍿', url='https://t.me/joinchat/ISZ9R5CdkgBlMzNl'),
-        InlineKeyboardButton('Source Code 🧾', url ='https://github.com/Alanstalinvellimon/Test')
-    ],[
-        InlineKeyboardButton('🎸UPDATE CHANNEL🎸', url='https://t.me/joinchat/axutdh3kmhExZjg1')
-    ],[
-        InlineKeyboardButton('Help ⚙', callback_data="help")
-    ]]
-    
-    reply_markup = InlineKeyboardMarkup(buttons)
-    
-    Send_message = await bot.send_photo( chat_id=update.chat.id,
- photo="https://telegra.ph/file/fd29a8d6e30223503ed7f.jpg",
- caption="<b>Couldn't Find This Movie.Try Again..! ഈ സിനിമയുടെ ഒറിജിനൽ പേര് ഗൂഗിളിൽ പോയി കണ്ടെത്തി അതുപോലെ ഇവിടെ കൊടുക്കുക 🥺</b>"),
-
-
-@Client.on_message(filters.command(["help"]) & filters.private, group=1)
-async def help(bot, update):
-    buttons = [[
-        InlineKeyboardButton('Home ⚡', callback_data='start'),
-        InlineKeyboardButton('About 🚩', callback_data='about')
-    ],[
-        InlineKeyboardButton('Close 🔐', callback_data='close')
-    ]]
-    
-    reply_markup = InlineKeyboardMarkup(buttons)
-    
-    await bot.send_message(
-        chat_id=update.chat.id,
-        text=Translation.HELP_TEXT,
-        reply_markup=reply_markup,
-        parse_mode="html",
-        reply_to_message_id=update.message_id
-    )
-
-
-@Client.on_message(filters.command(["about"]) & filters.private, group=1)
-async def about(bot, update):
-    
-    buttons = [[
-        InlineKeyboardButton('Home ⚡', callback_data='start'),
-        InlineKeyboardButton('Close 🔐', callback_data='close')
-    ]]
-    reply_markup = InlineKeyboardMarkup(buttons)
-    
-    await bot.send_message(
-        chat_id=update.chat.id,
-        text=Translation.ABOUT_TEXT,
-        reply_markup=reply_markup,
-        disable_web_page_preview=True,
-        parse_mode="html",
-        reply_to_message_id=update.message_id
-    )
+            InlineKeyboardButton('𝐂𝐇𝐀𝐍𝐍𝐄𝐋💗', url='https://t.me/joinchat/ISZ9R5CdkgBlMzNl'),
+            InlineKeyboardButton('𝐆𝐑𝐎𝐔𝐏⭕️', url='https://t.me/vlIeYa9keYUxZDY1')
+        ],[
+            InlineKeyboardButton('𝐔𝐏𝐃𝐀𝐓𝐄𝐒🎻', url='https://t.me/joinchat/axutdh3kmhExZjg1')
+        ]]
+    await message.reply(text="<b><u>😁എന്തിനാ മോനെ ഇത്രേം സാഹസം കാണിച്ചത് 📃Source Code📃 ന് വേണ്ടിയാണോ🙄ന്തയാലും ഇവിടെ വരെ വന്നില്ലേ🤔 ചാനലിലും ഗ്രൂപ്പിലുമൊക്കെ ജോയിൻ😛 ചെയ്തിട്ട് പൊക്കോ🚶🤧</u></b>", reply_markup=InlineKeyboardMarkup(buttons), disable_web_page_preview=True)

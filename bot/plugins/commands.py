@@ -56,10 +56,11 @@ async def start(bot, update):
     ]]
     
     reply_markup = InlineKeyboardMarkup(buttons)
+    else:
+        await cmd.reply_photo(
+
+            photo="https://telegra.ph/file/ddbd9b6322e5241394167.jpg",
     
-    Send_message = await bot.send_photo( chat_id=update.chat.id,
- photo="https://telegra.ph/file/fd29a8d6e30223503ed7f.jpg",
- caption="<b>Couldn't Find This Movie.Try Again..! ഈ സിനിമയുടെ ഒറിജിനൽ പേര് ഗൂഗിളിൽ പോയി കണ്ടെത്തി അതുപോലെ ഇവിടെ കൊടുക്കുക 🥺</b>"),
 
 
 @Client.on_message(filters.command(["help"]) & filters.private, group=1)

@@ -56,13 +56,15 @@ async def start(bot, update):
     ]]
     
     reply_markup = InlineKeyboardMarkup(buttons)
-    else:
-        await cmd.reply_photo(
-
-            photo="https://telegra.ph/file/ddbd9b6322e5241394167.jpg",
-    caption=f"<b>Hai</b> {cmd.from_user.mention}  Guys!🙋,\n\n<b>I'm[☞ 𝙰𝚄𝚃𝙾 𝙵𝙸𝙻𝚃𝙴𝚁 🤖](https://t.me/Movies_Squad_bot) or you can call me as Auto-Filter Bot You Can Use Me As A Auto-filter in Your Group</b> ....\n\n<b>Its Easy To Use Me; Just Add Me To Your Group As Admin, Thats All, i will Provide Movies There</b>...🤓\n\n<b>©️𝑴𝒂𝒊𝒏𝒕𝒂𝒊𝒏𝒆𝒅 𝒃𝒚</b>   <a href=tg://user?id=1959558775> Alan Stalin♨</a>",
-
-            reply_markup=InlineKeyboardMarkup(
+   
+await bot.send_message(
+        chat_id=update.chat.id,
+        text=Translation.START_TEXT.format(
+                update.from_user.first_name),
+        reply_markup=reply_markup,
+        parse_mode="html",
+        reply_to_message_id=update.message_id
+    )
 
 
 @Client.on_message(filters.command(["help"]) & filters.private, group=1)
